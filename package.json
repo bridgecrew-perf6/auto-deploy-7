@@ -1,0 +1,65 @@
+{
+  "name": "@digital/deploy",
+  "version": "1.0.2",
+  "description": "deploy project",
+  "main": "dist/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "bin": {
+    "deploy": "bin/index.js"
+  },
+  "scripts": {
+    "prepublishOnly": "babel lib/ -d es5/",
+    "predeploy": "npm version patch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "gulp",
+    "pub-local": "gulp && npm publish --registry http://192.168.200.6:4873",
+    "pub-remote": "gulp && npm publish --access public --registry https://registry.npmjs.org",
+    "unpub-remote": "npm unpublish @digitalzz/deploy --force --registry https://registry.npmjs.org",
+    "unpub-local": "npm unpublish @digitalzz/deploy --force --registry http://192.168.200.6:4873"
+  },
+  "author": "admin@digitalcnzz.com",
+  "license": "MIT",
+  "dependencies": {
+    "ali-oss": "^6.17.1",
+    "axios": "^0.27.2",
+    "commander": "^9.0.0",
+    "debug": "^2.6.0",
+    "ftp": "^0.3.10",
+    "readline-sync": "^1.4.10",
+    "shelljs": "^0.8.5",
+    "silly-datetime": "^0.1.2",
+    "simple-git": "^3.2.6",
+    "single-line-log": "^1.1.2",
+    "ssh2": "^1.10.0",
+    "ssh2-sftp-client": "^8.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-register": "^6.24.1",
+    "coveralls": "^2.13.1",
+    "doxmate": "^0.3.1",
+    "eslint": "^3.11.1",
+    "expect.js": "^0.3.1",
+    "gulp": "^4.0.2",
+    "gulp-rename": "^2.0.0",
+    "gulp-uglify": "^3.0.2",
+    "mocha": "^3.2.0",
+    "nyc": "^11.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://codeup.teambition.com/5e739cdd493a0908be68a284/digitalzz-web/digitalcnzz-products-fe/digitalcnzz-library-base/digitalcnzz-jsapi-library.git"
+  },
+  "bugs": {
+    "url": "https://codeup.teambition.com/5e739cdd493a0908be68a284/digitalzz-web/digitalcnzz-products-fe/digitalcnzz-library-base/digitalcnzz-jsapi-library/issues"
+  },
+  "homepage": "https://codeup.teambition.com/5e739cdd493a0908be68a284/digitalzz-web/digitalcnzz-products-fe/digitalcnzz-library-base/digitalcnzz-jsapi-library#readme",
+  "files": [
+    "dist",
+    "bin"
+  ]
+}

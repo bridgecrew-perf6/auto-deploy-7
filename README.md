@@ -5,7 +5,7 @@
 ## 安装
 
 ```js
-yarn add @digital/deploy -D --registry http://192.168.200.6:4873
+yarn add @digital/deploy@1.0.3 -D --registry http://192.168.200.6:4873
 ```
 
 ## 使用
@@ -13,63 +13,37 @@ yarn add @digital/deploy -D --registry http://192.168.200.6:4873
 ```js
 'use strict'
 
-import { OSSDeployClient, AutoDeployClient } from '@digital/deploy'
-
-// 创建csbClient实例的时候如果传了ak、sk则不需要在请求参数里面传入
-// 如果两个地方都有传入，则使用请求参数里面的ak、sk
-const ossDeployClient = new OSSDeployClient(accessKeyId, accessKeySecret, bucketName)
-
-// 列举所有bucket信息
-ossClient.listBuckets().then((res) => {})
-
-// 删除oss指定目录里面的所有文件
-listFiles({ dir: '2021/es5/' }).then((res) => {
-  for (let item of list.data) {
-    ossClient.deleteFile({ file: item.name }).then((res) => {})
-  }
-})
-
-// 下载oss指定目录里面的所有文件
-ossClient.downloadFile({ dir: '2021/es5/' }).then((res) => {})
-
-// 发版到指定的oss目录
-ossClient
-  .publishDir({
-    src: '/Users/es5',
-    dist: '2021/es5'
-  })
-  .then((res) => {})
-
-// 备份oss上面指定的目录
-ossClient
-  .backup({
-    origin: '2021',
-    target: '2021/backup',
-    version: '20220205',
-    project: 'es5'
-  })
-  .then((res) => {})
-
-// 备份oss上面指定的目录
-ossClient
-  .rollback({
-    origin: '2021/backup',
-    target: '2021',
-    version: '20220205',
-    project: 'es5'
-  })
-  .then((res) => {})
-
-// 删除oss上指定的文件目录
-ossClient.deleteDir({ dir: '2021/es5/' }).then((res) => {})
-
-const ecsClient = new ECSClient()
+import { OSSDeployClient, ECSDeployClient } from '@digital/deploy'
 
 // 云服务器部署
 // deployConfig.js
 let path = require('path')
 
-const options = {
+const ossOptions = {
+  appName: "xxx应用系统",          //应用名称
+  webName: "digitalcnzz-xx-web",               //应用目录名称
+  ossConfig: {
+    accessKeyId: "121212",   //应用名称
+    accessKeySecret: "23232323",   //应用名称
+    bucket: 'digitalzz',   //应用名称
+    endpoint: 'oss-cn-north-2-gov-1.aliyuncs.com',   //应用名称
+    region: 'oss-cn-north-2-gov-1',   //应用名称
+  },
+  deployConfig: {
+    localDir: path.resolve(__dirname, './dist'), //本地发版目录
+    remoteDir: "/syf/test",                   //远程发版目录(注意是绝对路径)
+    backupDir: "syf/test/backup"             //远程备份目录(注意是相对路径)
+  },
+  noticeConfig: {                                   //钉钉消息推送配置
+    dingList: [                                    //钉钉消息推送人员手机号列表
+      "15923902511"
+    ],
+    switch: true,                                   //钉钉消息推送开关配置(true:开 false:关)
+    webHookUrl: ""                                 //钉钉消息推送webHookUrl地址
+  }
+}
+
+const ecsOptions = {
   appName: 'xxx应用系统', //应用名称
   webName: 'appSystem', //应用目录名称
   serverList: [
@@ -102,24 +76,29 @@ const options = {
     webHookUrl: '' //钉钉消息推送webHookUrl地址
   }
 }
-module.exports = options
+module.exports = { ecsOptions, ossOptions }
 
-//deploy.js
-const { AutoDeployClient } = require('@digital/deploy')
-const options = require('./deployConfig')
-let server = new AutoDeployClient(options)
+const ecsDeployClient = new ECSDeployClient()
+
+//云主机发版回滚
+const { ecsOptions } = require('./deployConfig')
+let server = new ECSDeployClient(ecsOptions)
 server.upload()
+server.rollback()
 
-//rollback.js
-const { AutoDeployClient } = require('@digital/deploy')
-const options = require('./deployConfig')
-let server = new AutoDeployClient(options)
+const ossDeployClient = new OSSDeployClient()
+//OSS发版回滚
+const { ossOptions } = require('./deployConfig')
+let server = new OSSDeployClient(ossOptions)
+server.upload()
 server.rollback()
 
 //package.json
 "scripts": {
-  "deploy": "yarn build:prod && node script/deploy.js",
-  "rollback": "node script/rollback.js"
+  "deploy:ecs": "yarn build:prod && node script/ecsDeploy.js",
+  "rollback:ecs": "node script/ecsRollback.js",
+  "deploy:oss": "yarn build:prod && node script/ossDeploy.js",
+  "rollback:oss": "node script/ossRollback.js"
 }
 
 //注意事项
